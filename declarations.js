@@ -24,4 +24,5 @@ Object.freeze(nestedObj);
 const nested = {
     arr : nestedArr,
     obj : nestedObj
-}
+};
+Object.freeze(nested);
