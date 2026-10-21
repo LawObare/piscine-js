@@ -11,14 +11,17 @@ const obj = {
 };
 Object.freeze(obj);
 
-const nested = {
-    arr : [4, undefined, '2'],
-    obj : {
-        str : "Lawi",
-        num : 19,
-        bool : true
-    }
+const nestedArr = [4, undefined, '2'];
+const nestedObj = {
+    str : "Lawi",
+    num : 19,
+    bool : false,
 };
 
-Object.freeze(nested.arr);
-Object.freeze(nested.obj);
+Object.freeze(nestedArr);
+Object.freeze(nestedObj);
+
+const nested = {
+    arr : nestedArr,
+    obj : nestedObj
+}
