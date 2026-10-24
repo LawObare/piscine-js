@@ -43,7 +43,11 @@ function strToObj(str) {
 }
 
 function superTypeOf(val) {
-    if (val === null) return 'Null';
-    if (val === undefined) return 'Undefined';
-    return Object.prototype.toString.call(val).slice(8, -1);
+    if (val === null) return 'null';
+    if (val === undefined) return 'undefined';
+    let type = Object.prototype.toString.call(val).slice(8, -1);
+    if (type === 'Number' || type === 'String' || type === 'Boolean' || type === 'Function') {
+        return type.toLowerCase();
+    }
+    return type;
 }
