@@ -11,11 +11,12 @@ function multiply(a, b) {
   let count = makePositive(b);
 
   while (count > 0) {
-    result = result + a;
+    result = result + makePositive(a);
     count = count - 1;
   }
 
-  if (b < 0) {
+  const signsMismatch = (a < 0 && b > 0) || (a > 0 && b < 0);
+  if (signsMismatch) {
     return 0 - result;
   }
 
