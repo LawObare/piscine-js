@@ -14,11 +14,15 @@ function lastIndexOf(arr, value, start = 0) {
       result = i
     };
   };
-  return -1
+  if (result === 0) {
+    return -1
+  } else {
+    return result
+  };
 };
 
-function includes(arr, value) {
-  for (let i = 0; i < arr.length; i++) {
+function includes(arr, value, start = 0) {
+  for (let i = start; i < arr.length; i++) {
     if (arr[i] === value) {
       return true
     };
