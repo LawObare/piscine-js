@@ -1,7 +1,7 @@
 function indexOf(arr, value, start = 0) {
   for (let i = start; i < arr.length - 1; i++) {
     if (arr[i] === value) {
-      return arr[i]
+      return i
     };
   };
   return -1
@@ -10,7 +10,7 @@ function indexOf(arr, value, start = 0) {
 function lastIndexOf(arr, value) {
   for (let i = arr.length; i > 0; i--) {
     if (arr[i] === value) {
-      return arr[i]
+      return i
     };
   };
   return -1
