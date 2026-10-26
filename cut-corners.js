@@ -1,31 +1,48 @@
 function trunc(num) {
-  if (num >= 0) {
-    let intPart = 0;
-    while (intPart <= num) {
-      intPart++;
-    }
-    return intPart - 1;
-  } else {
-    let intPart = 0;
-    while (intPart >= num) {
-      intPart--;
-    }
-    return intPart + 1;
+  if (num === 0) {
+    return 0;
   }
+
+  let sign;
+  let absNum;
+
+  if (num < 0) {
+    sign = -1;
+    absNum = -num;
+  } else {
+    sign = 1;
+    absNum = num;
+  }
+
+  let intPart = 0;
+  let step = 4503599627370496;
+
+  while (step >= 1) {
+    if (intPart + step <= absNum) {
+      intPart += step;
+    }
+    step = step / 2;
+  }
+
+  return intPart * sign;
 }
 
 function floor(num) {
   const integer = trunc(num);
-  if (num < 0 && num !== integer) {
-    return integer - 1;
+  if (num < 0) {
+    if (num !== integer) {
+      return integer - 1;
+    }
   }
   return integer;
 }
 
 function ceil(num) {
   const integer = trunc(num);
-  if (num > 0 && num !== integer) {
-    return integer + 1;
+  if (num > 0) {
+    if (num !== integer) {
+      return integer + 1;
+    }
   }
   return integer;
 }
