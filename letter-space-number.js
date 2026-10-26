@@ -1,5 +1,11 @@
-function letterSpaceNumber(str) {
-    const pattern = /e\s1/g;
-    const result = str.match(pattern);
-    return result || []
+function letterSpaceNumber(str, arr = []) {
+    let result = [];
+    for (let i = 0; i < arr.length; i++) {
+      let matches = str.match(arr[i]);
+      if (matches) {
+        result.push(...matches);
+      }  
+     }
+    return result;
 };
+
