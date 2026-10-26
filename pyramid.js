@@ -5,8 +5,8 @@ function pyramid(str, nmbr, totalHeight = nmbr) {
 
   let currentRow = totalHeight - nmbr + 1;
 
-  let spaces = "";
-  let spaceCount = totalHeight - currentRow;
+  let spaces = ""; 
+  let spaceCount = (totalHeight - currentRow) * str.length;
   for (let i = 0; i < spaceCount; i++) {
     spaces = spaces + " ";
   }
