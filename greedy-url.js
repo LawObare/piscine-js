@@ -13,7 +13,7 @@ function greedyQuery(data) {
   return [];
 };
 function notSoGreedy(data) {
-  let pattern = /https?:\/\/[^\s?]+\?[^\s?&=,\[\]%]+=[^\s?&=,\[\]%]+(?:&[^\s?&=,\[\]%]+=[^\s?&=,\[\]%]+){1,2}(?!&)\b/g;
+  const pattern = /https?:\/\/[^\s?]+\?[^\s?&=,\[\]%]+=[^\s?&=]+(?:&[^\s?&=,\[\]%]+=[^\s?&=]+){1,2}(?<=[\w\]])(?![^\s?=%])/g;
   if (data.match(pattern)) {
     return data.match(pattern);
   }
