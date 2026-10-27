@@ -6,7 +6,7 @@ function getURL(data) {
   return [];
 };
 function greedyQuery(data) {
-  let pattern = /https?:\/\/[^\s?]+\?[^\s?&=,\[\]%]+=[^\s?&=,\[\]%]+(?:&[^\s?&=,\[\]%]+=[^\s?&=,\[\]%]+){2,}/g;
+   const pattern = /https?:\/\/[^\s?]+\?[^\s?&=,\[\]%]+=[^\s?&=%]+(?:&[^\s?&=,\[\]%]+=[^\s?&=%]+){2,}/g;
   if (data.match(pattern)) {
     return data.match(pattern);
   }
