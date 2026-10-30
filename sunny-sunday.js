@@ -4,21 +4,24 @@ function sunnySunday(date) {
   const epoch = new Date(0, 0, 1);
   epoch.setFullYear(1);
 
-  const msPerDay = 24 * 60 * 60 * 1000;
+  let count = 0;
+  const current = new Date(epoch.getTime());
 
-  const diffTime = date.getTime() - epoch.getTime();
-  const totalDays = Math.round(diffTime / msPerDay);
-
-  let skippedSundays;
-  if (totalDays >= 0) {
-    skippedSundays = Math.floor(totalDays / 7);
+  if (current <= date) {
+    while (current < date) {
+      if (current.getDay() !== 0) {
+        count++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    return days[count % 6];
   } else {
-    skippedSundays = Math.ceil(totalDays / 7);
+    while (current > date) {
+      current.setDate(current.getDate() - 1);
+      if (current.getDay() !== 0) {
+        count--;
+      }
+    }
+    return days[((count % 6) + 6) % 6];
   }
-
-  const runningDays = totalDays - skippedSundays;
-
-  const index = ((runningDays % 6) + 6) % 6;
-
-  return days[index];
 }
