@@ -1,7 +1,8 @@
-function adder(arr) {
+function adder(arr, initialValue) {
+  var start = initialValue !== undefined ? initialValue : 0;
   return arr.reduce(function(acc, curr) {
     return acc + curr;
-  }, 0);
+  }, start);
 }
 
 function sumOrMul(arr, initialValue) {
