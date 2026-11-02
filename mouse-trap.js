@@ -1,4 +1,5 @@
 const trapped = new WeakSet();
+const BORDER = 1;
 
 const getBox = () => document.querySelector('.box');
 
@@ -14,16 +15,16 @@ const placeCircle = (circle, x, y) => {
   circle.style.top = y - height / 2 + 'px';
 };
 
-// True only if the circle is strictly inside the box (not touching its 1px borders)
+// Circle is inside when it does not touch/overlap the box's 1px borders
 const isInsideBox = (circle, box) => {
   if (!box) return false;
   const c = circle.getBoundingClientRect();
   const b = box.getBoundingClientRect();
   return (
-    c.left > b.left + 1 &&
-    c.right < b.right - 1 &&
-    c.top > b.top + 1 &&
-    c.bottom < b.bottom - 1
+    c.left >= b.left + BORDER &&
+    c.right <= b.right - BORDER &&
+    c.top >= b.top + BORDER &&
+    c.bottom <= b.bottom - BORDER
   );
 };
 
@@ -33,6 +34,8 @@ const trapIfInside = (circle) => {
     trapped.add(circle);
   }
 };
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 export function createCircle() {
   document.addEventListener('click', (e) => {
@@ -48,8 +51,25 @@ export function createCircle() {
 export function moveCircle() {
   document.addEventListener('mousemove', (e) => {
     const circle = getLastCircle();
-    if (!circle || trapped.has(circle)) return;
-    placeCircle(circle, e.clientX, e.clientY);
+    if (!circle) return;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (trapped.has(circle)) {
+      // Trapped: keep following the mouse, but never leave the box
+      const box = getBox();
+      if (box) {
+        const b = box.getBoundingClientRect();
+        const { width, height } = circle.getBoundingClientRect();
+        x = clamp(x, b.left + BORDER + width / 2, b.right - BORDER - width / 2);
+        y = clamp(y, b.top + BORDER + height / 2, b.bottom - BORDER - height / 2);
+      }
+      placeCircle(circle, x, y);
+      return;
+    }
+
+    placeCircle(circle, x, y);
     trapIfInside(circle);
   });
 }
