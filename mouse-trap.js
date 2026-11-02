@@ -1,55 +1,79 @@
 let currentCircle = null;
 let trapBox = null;
 
-export function createCircle() {
-  document.addEventListener('click', function(event) {
-    if (event.target.classList.contains('box') || event.target.classList.contains('circle')) {
+export function createCircle(e) {
+  function handler(event) {
+    if (event.target.classList.contains('box')) {
       return;
     }
-
     var circle = document.createElement('div');
     circle.className = 'circle';
     circle.style.background = 'white';
     circle.style.position = 'absolute';
-    circle.style.left = (event.clientX - 25) + 'px';
-    circle.style.top = (event.clientY - 25) + 'px';
-
+    circle.style.left = event.clientX + 'px';
+    circle.style.top = event.clientY + 'px';
+    
     document.body.appendChild(circle);
     currentCircle = circle;
+  }
 
-    checkTrapped(event.clientX, event.clientY);
-  });
+  if (e && e.clientX !== undefined) {
+    handler(e);
+  } else {
+    document.addEventListener('click', handler);
+  }
 }
 
-export function moveCircle() {
-  document.addEventListener('mousemove', function(event) {
+export function moveCircle(e) {
+  function handler(event) {
     if (!currentCircle) return;
-
+    
     var x = event.clientX;
     var y = event.clientY;
-
-    if (currentCircle.dataset.trapped === 'true') {
+    
+    if (currentCircle.getAttribute('data-trapped') === 'true' || currentCircle.style.background === 'var(--purple)') {
       if (trapBox) {
         var boxRect = trapBox.getBoundingClientRect();
-        var leftLimit = boxRect.left + 26;
-        var rightLimit = boxRect.right - 26;
-        var topLimit = boxRect.top + 26;
-        var bottomLimit = boxRect.bottom - 26;
-
+        var circleRect = currentCircle.getBoundingClientRect();
+        var radius = circleRect.width / 2;
+        
+        var leftLimit = boxRect.left + 1;
+        var rightLimit = boxRect.right - 1 - (circleRect.width || 50);
+        var topLimit = boxRect.top + 1;
+        var bottomLimit = boxRect.bottom - 1 - (circleRect.height || 50);
+        
         if (x < leftLimit) x = leftLimit;
         if (x > rightLimit) x = rightLimit;
         if (y < topLimit) y = topLimit;
         if (y > bottomLimit) y = bottomLimit;
       }
     }
-
-    currentCircle.style.left = (x - 25) + 'px';
-    currentCircle.style.top = (y - 25) + 'px';
-
-    if (currentCircle.dataset.trapped !== 'true') {
-      checkTrapped(x, y);
+    
+    currentCircle.style.left = x + 'px';
+    currentCircle.style.top = y + 'px';
+    
+    if (trapBox && currentCircle.style.background !== 'var(--purple)') {
+      var boxRect = trapBox.getBoundingClientRect();
+      var cWidth = currentCircle.offsetWidth || 50;
+      var cHeight = currentCircle.offsetHeight || 50;
+      
+      if (
+        x > boxRect.left &&
+        (x + cWidth) < boxRect.right &&
+        y > boxRect.top &&
+        (y + cHeight) < boxRect.bottom
+      ) {
+        currentCircle.style.background = 'var(--purple)';
+        currentCircle.setAttribute('data-trapped', 'true');
+      }
     }
-  });
+  }
+
+  if (e && e.clientX !== undefined) {
+    handler(e);
+  } else {
+    document.addEventListener('mousemove', handler);
+  }
 }
 
 export function setBox() {
@@ -57,25 +81,4 @@ export function setBox() {
   box.className = 'box';
   document.body.appendChild(box);
   trapBox = box;
-}
-
-function checkTrapped(x, y) {
-  if (!currentCircle || !trapBox) return;
-
-  var boxRect = trapBox.getBoundingClientRect();
-
-  var circleLeft = x - 25;
-  var circleRight = x + 25;
-  var circleTop = y - 25;
-  var circleBottom = y + 25;
-
-  if (
-    circleLeft > boxRect.left &&
-    circleRight < boxRect.right &&
-    circleTop > boxRect.top &&
-    circleBottom < boxRect.bottom
-  ) {
-    currentCircle.style.background = 'var(--purple)';
-    currentCircle.dataset.trapped = 'true';
-  }
 }
