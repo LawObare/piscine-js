@@ -87,10 +87,11 @@ export function explore() {
     if (index === current) return;
     current = index;
 
-    const { name, coordinates, color, parsed } = sorted[index];
-    location.textContent = `${name}\n${formatCoordinates(coordinates)}`;
+    const { name, coordinates, color } = sorted[index];
+    const coords = formatCoordinates(coordinates);
+    location.textContent = `${name}\n${coords}`;
     location.style.color = color;
-    location.href = `https://www.google.com/maps?q=${parsed[0]},${parsed[1]}`;
+    location.href = `https://www.google.com/maps?q=${encodeURIComponent(coords)}`;
   };
 
   let lastScroll = window.scrollY;
