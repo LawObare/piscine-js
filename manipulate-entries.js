@@ -17,29 +17,26 @@ function reduceEntries(obj, callback, initialValue) {
 }
 
 function totalCalories(cart) {
-  const db = typeof nutritionDB !== 'undefined' ? nutritionDB : globalThis.nutritionDB || {};
   const totalRaw = reduceEntries(cart, (acc, [item, grams]) => {
-    const itemCal = db[item] ? db[item].calories : 0;
+    const itemCal = nutritionDB[item] ? nutritionDB[item].calories : 0;
     return acc + itemCal * grams;
   }, 0);
   return Math.round((totalRaw / 100) * 10) / 10;
 }
 
 function lowCarbs(cart) {
-  const db = typeof nutritionDB !== 'undefined' ? nutritionDB : globalThis.nutritionDB || {};
   return filterEntries(cart, ([item, grams]) => {
-    const per100gCarbs = db[item] ? db[item].carbs : 0;
+    const per100gCarbs = nutritionDB[item] ? nutritionDB[item].carbs : 0;
     const itemTotalCarbs = (per100gCarbs * grams) / 100;
     return itemTotalCarbs < 50;
   });
 }
 
 function cartTotal(cart) {
-  const db = typeof nutritionDB !== 'undefined' ? nutritionDB : globalThis.nutritionDB || {};
   const round3 = (x) => Math.round(x * 1000) / 1000;
 
   return mapEntries(cart, ([item, grams]) => {
-    const nutrition = db[item] || {};
+    const nutrition = nutritionDB[item] || {};
     const itemTotalFacts = {};
 
     for (const key in nutrition) {
