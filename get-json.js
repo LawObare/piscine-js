@@ -1,41 +1,18 @@
-async function getJSON(path, params) {
-  let url = path;
+const getJSON = async (path, params) => {
+  const query = new URLSearchParams(params).toString()
+  const url = query ? `${path}?${query}` : path
 
-  if (params && Object.keys(params).length > 0) {
-    const queryString = new URLSearchParams(params).toString();
-    url = `${path}?${queryString}`;
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(response.statusText)
   }
 
-  let response;
-  try {
-    response = await fetch(url);
-  } catch (e) {
-    return;
+  const json = await response.json()
+
+  if (json.error) {
+    throw new Error(json.error)
   }
 
-  if (response && response.ok === false) {
-    throw new Error(response.statusText || 'Error');
-  }
-
-  if (!response || typeof response.json !== 'function') {
-    return;
-  }
-
-  let result;
-  try {
-    result = await response.json();
-  } catch (err) {
-    return;
-  }
-
-  if (result && typeof result === 'object') {
-    if ('error' in result) {
-      throw new Error(result.error);
-    }
-    if ('data' in result) {
-      return result.data;
-    }
-  }
-
-  return result;
+  return json.data
 }
