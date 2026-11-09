@@ -1,26 +1,35 @@
 async function getJSON(path, params) {
   let url = path;
 
-  if (params && Object.keys(params).length > 0) {
+  if (params) {
     const queryString = new URLSearchParams(params).toString();
-    url = `${path}?${queryString}`;
+    if (queryString) {
+      url = `${path}?${queryString}`;
+    }
   }
 
   const response = await fetch(url);
 
-  if (!response.ok) {
-    throw new Error(response.statusText || `HTTP error! status: ${response.status}`);
+  if (response && response.ok === false) {
+    throw new Error(response.statusText || 'Error');
   }
 
-  const result = await response.json();
+  try {
+    const result = await response.json();
 
-  if (result && typeof result === 'object' && 'error' in result) {
-    throw new Error(result.error);
+    if (result && typeof result === 'object') {
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      if ('data' in result) {
+        return result.data;
+      }
+    }
+    return result;
+  } catch (err) {
+    if (err instanceof Error && (err.message === 'Error' || err.message === response?.statusText || err.message === result?.error)) {
+      throw err;
+    }
+    throw new Error(response?.statusText || 'Error');
   }
-
-  if (result && typeof result === 'object' && 'data' in result) {
-    return result.data;
-  }
-
-  return result;
 }
