@@ -1,28 +1,31 @@
 async function getJSON(path, params) {
   let url = path;
 
-  if (params) {
+  if (params && Object.keys(params).length > 0) {
     const queryString = new URLSearchParams(params).toString();
-    if (queryString) {
-      url = `${path}?${queryString}`;
-    }
+    url = `${path}?${queryString}`;
   }
 
-  const response = await fetch(url);
+  let response;
+  try {
+    response = await fetch(url);
+  } catch (e) {
+    return;
+  }
 
   if (response && response.ok === false) {
     throw new Error(response.statusText || 'Error');
   }
 
   if (!response || typeof response.json !== 'function') {
-    return response;
+    return;
   }
 
   let result;
   try {
     result = await response.json();
   } catch (err) {
-    throw new Error(response?.statusText || 'Error');
+    return;
   }
 
   if (result && typeof result === 'object') {
