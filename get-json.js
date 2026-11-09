@@ -14,6 +14,10 @@ async function getJSON(path, params) {
     throw new Error(response.statusText || 'Error');
   }
 
+  if (!response || typeof response.json !== 'function') {
+    return response;
+  }
+
   let result;
   try {
     result = await response.json();
