@@ -1,38 +1,55 @@
-function debounce(func, wait) {
-  let timeoutId;
+function throttle(func, wait) {
+  let isThrottled = false;
 
   return function (...args) {
     const context = this;
 
-    clearTimeout(timeoutId);
-
-    timeoutId = setTimeout(() => {
+    if (!isThrottled) {
       func.apply(context, args);
-    }, wait);
+      isThrottled = true;
+
+      setTimeout(() => {
+        isThrottled = false;
+      }, wait);
+    }
   };
 }
 
-function opDebounce(func, wait, options = {}) {
+function opThrottle(func, wait, options = {}) {
   let timeoutId = null;
+  let lastArgs = null;
+  let lastContext = null;
+
   const leading = !!options.leading;
+  const trailing = !!options.trailing;
 
   return function (...args) {
     const context = this;
-    const shouldCallNow = leading && !timeoutId;
 
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(() => {
+    const wrapper = () => {
       timeoutId = null;
-      if (!leading) {
-        func.apply(context, args);
+      if (trailing && lastArgs) {
+        func.apply(lastContext, lastArgs);
+        lastArgs = null;
+        lastContext = null;
+        timeoutId = setTimeout(wrapper, wait);
       }
-    }, wait);
+    };
 
-    if (shouldCallNow) {
-      func.apply(context, args);
+    if (!timeoutId) {
+      if (leading) {
+        func.apply(context, args);
+      } else if (trailing) {
+        lastArgs = args;
+        lastContext = context;
+      }
+      
+      if (leading || trailing) {
+        timeoutId = setTimeout(wrapper, wait);
+      }
+    } else if (trailing) {
+      lastArgs = args;
+      lastContext = context;
     }
   };
 }
