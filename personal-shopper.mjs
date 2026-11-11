@@ -42,7 +42,10 @@ try {
     if (entries.length === 0) console.log('Empty list.')
     else entries.forEach(([name, qty]) => console.log(`- ${name} (${qty})`))
   } else if (command === 'add' || command === 'rm') {
-    if (!item) throw new Error(`"${command}" needs an item name`)
+    if (!item) {
+      console.error('No elem specified.')
+      process.exit(0)
+    }
 
     const list = await load()
 
