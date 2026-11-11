@@ -1,4 +1,6 @@
 function findExpression(target) {
+  const add4 = "+4"
+  const mul2 = "*2"
   const dead = new Set() // values already known to lead nowhere
 
   const search = (value, path) => {
