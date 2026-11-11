@@ -1,6 +1,6 @@
 import { readFile, writeFile, rm } from 'node:fs/promises'
 
-const [file, command, item, quantity] = process.argv.slice(2)
+const [file, command, elem, quantity] = process.argv.slice(2)
 
 const HELP = [
   'Commands:',
@@ -12,6 +12,7 @@ const HELP = [
   '- help: displays all available commands',
 ].join('\n')
 
+// Falls back to {} when the file is absent or unreadable
 const load = async () => {
   try {
     return JSON.parse(await readFile(file, 'utf8'))
@@ -22,7 +23,7 @@ const load = async () => {
 
 const save = (list) => writeFile(file, JSON.stringify(list, null, 2))
 
-// One rule for both commands: add the delta, and drop the item if it ends up at 0 or below
+// Add `delta` to the item; an item that ends at 0 or below is removed
 const change = (list, name, delta) => {
   const current = Object.hasOwn(list, name) ? list[name] : 0
   const total = current + delta
@@ -30,44 +31,57 @@ const change = (list, name, delta) => {
   else delete list[name]
 }
 
-try {
-  if (file === 'help' || !command || command === 'help') {
+const main = async () => {
+  if (file === 'help' || !command || !['create', 'delete', 'add', 'rm', 'ls'].includes(command)) {
     console.log(HELP)
-  } else if (command === 'create') {
+    return
+  }
+
+  if (command === 'create') {
     await writeFile(file, '{}')
-  } else if (command === 'delete') {
+    return
+  }
+
+  if (command === 'delete') {
     await rm(file, { force: true })
-  } else if (command === 'ls') {
+    return
+  }
+
+  if (command === 'ls') {
     const entries = Object.entries(await load())
     if (entries.length === 0) console.log('Empty list.')
     else entries.forEach(([name, qty]) => console.log(`- ${name} (${qty})`))
-  } else if (command === 'add' || command === 'rm') {
-    if (!item) {
-      console.error('No elem specified.')
-      process.exit(0)
-    }
-
-    const list = await load()
-
-    if (command === 'add') {
-      const n = quantity === undefined ? 1 : Number(quantity)
-      if (Number.isNaN(n)) throw new Error('quantity must be a number')
-      change(list, item, n)
-    } else if (quantity === undefined) {
-      delete list[item]
-    } else {
-      const n = Number(quantity)
-      if (Number.isNaN(n)) {
-        console.log('Unexpected request: nothing has been removed')
-        process.exit(0)
-      }
-      change(list, item, -n)
-    }
-
-    await save(list)
-  } else {
-    console.log(HELP)
+    return
   }
+
+  // add / rm
+  if (!elem) {
+    console.error('No elem specified.')
+    return
+  }
+
+  const list = await load()
+
+  if (command === 'add') {
+    const n = Number(quantity)
+    change(list, elem, Number.isNaN(n) ? 1 : n) // missing or NaN quantity → 1
+  } else if (quantity === undefined) {
+    if (!Object.hasOwn(list, elem)) return // not in the list: do nothing
+    delete list[elem]
+  } else {
+    const n = Number(quantity)
+    if (Number.isNaN(n)) {
+      console.log('Unexpected request: nothing has been removed')
+      return
+    }
+    change(list, elem, -n) // negative n adds, and creates the item if needed
+  }
+
+  await save(list)
+}
+
+try {
+  await main()
 } catch (error) {
-  console.error('Error:', error.message)
+  console.error(error.message)
 }
